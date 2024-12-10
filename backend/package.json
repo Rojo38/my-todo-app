@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "start": "node ./app.js",
-    "dev": "nodemonn ./app.js",
+    "start": "node ./src/app.js",
+    "dev": "nodemon ./src/app.js",
     "test": "jest",
-    "test:integratio": "cypress run"
+    "test:integration": "cypress run"
   },
   "repository": {
     "type": "git",

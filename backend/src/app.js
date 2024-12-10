@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
-const Task = require('./models/tasks');
+const Task = require('./models/task');
 require('dotenv').config();
 
 const app = express();
@@ -11,25 +11,51 @@ app.use(express.json());
 // Connexion à MongoDB
 connectDB();
 
+
 // CRUD API Endpoints
+
+app.get('/', (req, res) => {res.end("Welcome to your DB")})
+
+// Obtenir toutes les tâches
 app.get('/tasks', async (req, res) => {
-    const tasks = await Task.find();
-    res.json(tasks);
+    try {
+        const tasks = await Task.find();
+        res.json(tasks);
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to fetch tasks' });
+    }
 });
-  
+
+// Ajouter une nouvelle tâche
 app.post('/tasks', async (req, res) => {
-    const task = new Task(req.body);
-    await task.save();
-    res.json(task);
+    try {
+        const task = new Task(req.body);
+        await task.save();
+        res.status(201).json(task);
+    } catch (err) {
+        res.status(400).json({ error: 'Failed to add task', details: err.message });
+    }
 });
   
-// Exemple de modèle de tâche
-const taskSchema = new mongoose.Schema({
-    title: { type: String, required: true },
-    description: { type: String }
+// Supprimer une tâche
+app.delete('/tasks/:id', async (req, res) => {
+    try {
+        await Task.findByIdAndDelete(req.params.id);
+        res.status(204).send();
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to delete task' });
+    }
 });
   
-const Task = mongoose.model('Task', taskSchema);
+// Mettre à jour une tâche
+app.put('/tasks/:id', async (req, res) => {
+    try {
+        const updatedTask = await Task.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        res.json(updatedTask);
+    } catch (err) {
+        res.status(400).json({ error: 'Failed to update task', details: err.message });
+    }
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Serveur lancé sur le port ${PORT}`));
