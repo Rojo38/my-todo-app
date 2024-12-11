@@ -19,7 +19,7 @@ app.get('/', (req, res) => {res.end("Welcome to your DB")})
 // Obtenir toutes les tâches
 app.get('/tasks', async (req, res) => {
     try {
-        const tasks = await Task.find();
+        const tasks = await Task.find({completed: false});
         res.json(tasks);
     } catch (err) {
         res.status(500).json({ error: 'Failed to fetch tasks' });

@@ -1,71 +1,146 @@
-import React, {useState} from 'react';
+// App.js
+
+import React, { useState , useEffect } from 'react';
 import './App.css';
-import '../node_modules/bulma/css/bulma.min.css'
-import Header from './Components/Header/Header.js'
-import Card from './Components/Card/Card.js'
+import '../node_modules/bulma/css/bulma.min.css';
+import Header from './Components/Header/Header.js';
+import Card from './Components/Card/Card.js';
 
 function App() {
 
-  const [myList, setList] = useState([
-    {task: "Apprendre React", text: "Components, StateManagements, ContextAPI"},
-    {task: "Creer un BD", text: "PostgreSQL"}
-  ])
+  const API_URL = 'http://backend:5000';
 
-  const [myTask, setTask] = useState()
-  const [myText, setText] = useState()
+  const [updateTheTask, setUpdateTheTask]  = useState(false);
+  const [idToBeUpdated, setIdToBeUpdated] = useState('');
 
-  function  creationCard(e) {
-    e.preventDefault()
-    const newList = [...myList, {task: myTask, text: myText}]
-    setList(newList)
-    setTask('')
-    setText('')
+  const [newTitle, setNewTitle] = useState("");
+  const [newDescription, setNewDescription] = useState("");
+  const [allTasks, setAllTasks] = useState([]);
+
+  // Fonction pour récupérer les tâches depuis le backend
+  const fetchTasks = async () => {
+    try {
+      const response = await fetch(API_URL+'/tasks');
+      if (!response.ok) {
+        throw new Error(`Erreur : ${response.status}`);
+      }
+      let tasks = await response.json();
+      setAllTasks(tasks);
+    } catch (err) {
+      console.error(`Échec de récupération des tâches : ${err.message}`);
+    }
+  };
+
+  // useEffect(()=>{fetchTasks();}, []); // [] pour exécuter l'effet uniquement lors du premier rendu
+  useEffect(()=>{fetchTasks();});
+
+
+  function creationTask(e) {
+    e.preventDefault();
+    if (!updateTheTask) {
+      fetch(API_URL+'/tasks', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({title: newTitle, description: newDescription, completed: false, createdAt: new Date()})
+      })
+      .then((response) => JSON.parse(response))
+      .then(data => {setAllTasks(data)})
+      .catch(error => {console.error(error)});
+
+      setNewTitle("");
+      setNewDescription("");
+    }
+    else updateTask(idToBeUpdated);
   }
 
-  function supprCard(index) {
-    const filteredList = [...myList]
-    setList(filteredList.filter(item => filteredList.indexOf(item) !== filteredList.indexOf(filteredList[index])))
+  function updateTask(id) {
+    fetch(API_URL+'/tasks/'+id, {
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({title: newTitle, description: newDescription})
+    })
+    
+    setUpdateTheTask(false);
+    setNewTitle("");
+    setNewDescription("");
   }
+
+  function displayTaskForUpdate(id,t,d) {
+    setNewTitle(t);
+    setNewDescription(d);
+
+    setUpdateTheTask(true);
+    setIdToBeUpdated(id);
+  }
+
+  function annulerUpdate() {
+    setNewTitle("");
+    setNewDescription("");
+    setUpdateTheTask(false);
+  }
+  
+  function deleteTask(id) {
+    fetch(API_URL+'/tasks/'+id, {
+      method: 'DELETE',
+
+    }).catch(error=>{console.error(error)});
+  }
+  
 
   return (
     <div>
       <Header />
-      
 
       <div className="container p-2">
         <h2 className="title is-5">Entrez vos tâches à faire</h2>
 
-        <form onSubmit={creationCard}>
-            <div className="field">
-                <label htmlFor="tache" className="label">Tâche</label>
-                <div className="control">
-                    <input id='task' type="text" className="input is-medium" placeholder='Tâches à faire' onChange={e => setTask(e.target.value)} value={myTask} />
-                </div>
-            </div>
 
-            <div className="field">
-                <label htmlFor="contenu" className="label">Contenu de la tâche</label>
-                <textarea id='text' className='textarea is-medium' name="contenu" id="contenu" placeholder='Description' onChange={e => setText(e.target.value)} value={myText}></textarea>
+        <form onSubmit={creationTask}>
+          <div className="field">
+            <label htmlFor="task" className='label'>Tâche</label>
+            <div className="control">
+              <input type="text" id="task" className="input is-medium" placeholder='Tâches à faire' onChange={e => setNewTitle(e.target.value)} value={newTitle} required />
             </div>
+          </div>
 
-            <div className="field">
-                <div className="control">
-                    <button className="button is-link">Créer une tâche</button>
-                </div>
-            </div>
+          <div className="field">
+            <label htmlFor="contenu">Contenu de la tâche</label>
+            <textarea name="contenu" id="contenu" className='textarea is-medium' placeholder='Description' onChange={e => setNewDescription(e.target.value)} value={newDescription}></textarea>
+          </div>
+
+          <div className="field is-grouped">
+
+            {updateTheTask ? (
+              <div className="control">
+                <button className="button is-link" type='submit'>Modifier la tâche</button>
+              </div>
+            ) : null}
+
+
+            {updateTheTask ? (
+              <div className="control">
+                <button className="button is-danger" type='reset' onClick={annulerUpdate}>Annuler</button>
+              </div>
+            ) : null}
+
+            {!updateTheTask ? (
+              <div className="control">
+                <button className="button is-link" type='submit'>Créer une tâche</button>
+              </div>
+            ) : null}
+
+          </div>
+
         </form>
+
       </div>
 
-
-      {
-        myList.map( (todo, index) => (
-          <Card key={index} index={index} task={todo.task} supprCard={supprCard} text={todo.text} />
-         ) )
-      }
+      {allTasks.map(task => (
+        <Card key={task._id} id={task._id} title={task.title} description={task.description} date={task.createdAt} displayTaskForUpdate={displayTaskForUpdate} deleteTask={deleteTask} />
+      ))}
+      
     </div>
   );
-  
-  
 }
 
 export default App;
