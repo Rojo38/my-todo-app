@@ -1,5 +1,3 @@
-// App.js
-
 import React, { useState , useEffect } from 'react';
 import './App.css';
 import '../node_modules/bulma/css/bulma.min.css';
@@ -8,7 +6,8 @@ import Card from './Components/Card/Card.js';
 
 function App() {
 
-  const API_URL = 'http://backend:5000';
+  // const API_URL = 'http://backend:5000';
+  const API_URL = 'http://localhost:5000';
 
   const [updateTheTask, setUpdateTheTask]  = useState(false);
   const [idToBeUpdated, setIdToBeUpdated] = useState('');
