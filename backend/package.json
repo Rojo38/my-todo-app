@@ -25,6 +25,7 @@
   "homepage": "https://github.com/Rojonantenaina-RAK/my-todo-app#readme",
   "description": "",
   "devDependencies": {
+    "@jridgewell/gen-mapping": "^0.3.8",
     "cypress": "^13.16.1",
     "jest": "^29.7.0",
     "mongodb-memory-server": "^10.1.2",
