@@ -25,13 +25,13 @@ function App() {
       }
       let tasks = await response.json();
       setAllTasks(tasks);
-    } catch (err) {
-      console.error(`Échec de récupération des tâches : ${err.message}`);
-    }
+    } catch(error){} // catch (err) {
+      // console.error(`Échec de récupération des tâches : ${err.message}`);
+    //}
   };
 
   // useEffect(()=>{fetchTasks();}, []); // [] pour exécuter l'effet uniquement lors du premier rendu
-  useEffect(()=>{fetchTasks();});
+  useEffect(()=>{fetchTasks();},[]);
 
 
   function creationTask(e) {
@@ -44,10 +44,12 @@ function App() {
       })
       .then((response) => JSON.parse(response))
       .then(data => {setAllTasks(data)})
-      .catch(error => {console.error(error)});
+      .catch(error => {console.log(error)});
 
       setNewTitle("");
       setNewDescription("");
+
+      fetchTasks();
     }
     else updateTask(idToBeUpdated);
   }
@@ -62,6 +64,8 @@ function App() {
     setUpdateTheTask(false);
     setNewTitle("");
     setNewDescription("");
+
+    fetchTasks();
   }
 
   function displayTaskForUpdate(id,t,d) {
@@ -83,6 +87,8 @@ function App() {
       method: 'DELETE',
 
     }).catch(error=>{console.error(error)});
+
+    fetchTasks();
   }
   
 
