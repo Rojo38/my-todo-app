@@ -28,8 +28,6 @@ docker-compose.override.yml
 docker-compose.override.yaml
 # *.env
 Dockerfile*
-*compose.yml
-*compose.yaml
 
 # Cypress
 cypress/videos/

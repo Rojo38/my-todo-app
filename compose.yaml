@@ -1,0 +1,24 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80" # Le frontend sera accessible sur le port 3000
+    depends_on:
+      - backend # Attendre que le backend soit disponible
+    networks:
+      - my-todo-app-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000" # Le backend sera accessible sur le port 5000
+    networks:
+      - my-todo-app-network
+
+networks:
+  my-todo-app-network:
+    driver: bridge
