@@ -1,68 +1,68 @@
-# name: CI/CD Pipeline #
+name: CI/CD Pipeline
 
-# on:
-#   push:
-#     branches:
-#       - main
-#   pull_request:
-#     branches:
-#       - main
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
-# jobs:
-#   test:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Checkout Code
-#         uses: actions/checkout@v3
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-#       - name: Set up Node.js
-#         uses: actions/setup-node@v3
-#         with:
-#           node-version: 22.11.0
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22.11.0
 
-#       - name: Install Dependencies
-#         run: npm install
+      - name: Install Dependencies
+        run: npm install
 
-#       - name: Run Tests
-#         run: npm test
+      - name: Run Tests
+        run: npm test
         
-#       - name: Add Comment to Pull Request
-#         if: failure()
-#         uses: actions/github-script@v6
-#         with:
-#           script: |
-#             github.rest.issues.createComment({
-#               issue_number: context.issue.number,
-#               owner: context.repo.owner,
-#               repo: context.repo.repo,
-#               body: "🚨 Tests failed! Please check the workflow logs: ${process.env.GITHUB_RUN_URL}"
-#             })
+      - name: Add Comment to Pull Request
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: "🚨 Tests failed! Please check the workflow logs: ${process.env.GITHUB_RUN_URL}"
+            })
 
-#       - name: Add Comment to Pull Request
-#         if: success()
-#         uses: actions/github-script@v6
-#         with:
-#           script: |
-#             github.rest.issues.createComment({
-#               issue_number: context.issue.number,
-#               owner: context.repo.owner,
-#               repo: context.repo.repo,
-#               body: "✅ Tests passed successfully! 🎉 You can review and merge the changes. Check the workflow logs here: ${process.env.GITHUB_RUN_URL}"
-#             })
+      - name: Add Comment to Pull Request
+        if: success()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: "✅ Tests passed successfully! 🎉 You can review and merge the changes. Check the workflow logs here: ${process.env.GITHUB_RUN_URL}"
+            })
 
 
-  # build-and-deploy:
-  #   runs-on: ubuntu-latest
-  #   needs: test  # Cette étape ne s'exécute que si "test" réussit
-  #   steps:
-  #     - name: Checkout Code
-  #       uses: actions/checkout@v3
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    needs: test  # Cette étape ne s'exécute que si "test" réussit
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-  #     - name: Build Application
-  #       run: npm run build
+      - name: Build Application
+        run: npm run build
 
-  #     - name: Deploy Application
-  #       run: ./deploy.sh  # Exemple de script de déploiement
+      - name: Deploy Application
+        run: ./deploy.sh  # Exemple de script de déploiement
 
 
 

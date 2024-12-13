@@ -5,8 +5,7 @@
   "scripts": {
     "start": "node ./src/app.js",
     "dev": "nodemon ./src/app.js",
-    "test": "jest",
-    "test:integration": "cypress run"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -26,7 +25,6 @@
   "description": "",
   "devDependencies": {
     "@jridgewell/gen-mapping": "^0.3.8",
-    "cypress": "^13.16.1",
     "jest": "^29.7.0",
     "mongodb-memory-server": "^10.1.2",
     "nodemon": "^3.1.7",
