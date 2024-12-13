@@ -10,3 +10,7 @@ docker compose -d
 frontend: localhost:3000
 backend:  localhost:5000
 ```
+
+<br>
+
+by **Rojo-Nanteh**☀️
