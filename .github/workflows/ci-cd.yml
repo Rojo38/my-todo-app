@@ -20,10 +20,19 @@ jobs:
         with:
           node-version: 22.11.0
 
+      # Install dependencies and run tests in the backend
+      - name: Install Backend Dependencies
+        working-directory: ./backend
+        run: npm install && npm start
+
+      - name: Run Backend Tests
+        working-directory: ./backend
+        run: npm run test
+
       # Install dependencies and run tests in the frontend
       - name: Install Frontend Dependencies
         working-directory: ./frontend
-        run: npm install
+        run: npm install && npm start
 
       - name: Run Frontend Unit Tests
         working-directory: ./frontend
@@ -32,15 +41,6 @@ jobs:
       - name: Run Frontend Integration Tests
         working-directory: ./frontend
         run: npm run test:integration
-
-      # Install dependencies and run tests in the backend
-      - name: Install Backend Dependencies
-        working-directory: ./backend
-        run: npm install
-
-      - name: Run Backend Tests
-        working-directory: ./backend
-        run: npm run test
 
       # Add comment to pull request if any tests fail
       - name: Add Comment to Pull Request (On Failure)
