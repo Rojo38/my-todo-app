@@ -20,13 +20,30 @@ jobs:
         with:
           node-version: 22.11.0
 
-      - name: Install Dependencies
+      # Install dependencies and run tests in the frontend
+      - name: Install Frontend Dependencies
+        working-directory: ./frontend
         run: npm install
 
-      - name: Run Tests
-        run: npm test
-        
-      - name: Add Comment to Pull Request
+      - name: Run Frontend Unit Tests
+        working-directory: ./frontend
+        run: npm run test
+
+      - name: Run Frontend Integration Tests
+        working-directory: ./frontend
+        run: npm run test:integration
+
+      # Install dependencies and run tests in the backend
+      - name: Install Backend Dependencies
+        working-directory: ./backend
+        run: npm install
+
+      - name: Run Backend Tests
+        working-directory: ./backend
+        run: npm run test
+
+      # Add comment to pull request if any tests fail
+      - name: Add Comment to Pull Request (On Failure)
         if: failure()
         uses: actions/github-script@v6
         with:
@@ -35,10 +52,11 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: "🚨 Tests failed! Please check the workflow logs: ${process.env.GITHUB_RUN_URL}"
+              body: "🚨 Some tests failed! Please check the workflow logs: ${process.env.GITHUB_RUN_URL}"
             })
 
-      - name: Add Comment to Pull Request
+      # Add comment to pull request if all tests pass
+      - name: Add Comment to Pull Request (On Success)
         if: success()
         uses: actions/github-script@v6
         with:
@@ -47,22 +65,21 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: "✅ Tests passed successfully! 🎉 You can review and merge the changes. Check the workflow logs here: ${process.env.GITHUB_RUN_URL}"
+              body: "✅ All tests passed successfully! 🎉 You can review and merge the changes. Check the workflow logs here: ${process.env.GITHUB_RUN_URL}"
             })
 
+  # build-and-deploy:
+  #   runs-on: ubuntu-latest
+  #   needs: test  # Cette étape ne s'exécute que si "test" réussit
+  #   steps:
+  #     - name: Checkout Code
+  #       uses: actions/checkout@v3
 
-  build-and-deploy:
-    runs-on: ubuntu-latest
-    needs: test  # Cette étape ne s'exécute que si "test" réussit
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+  #     - name: Build Application
+  #       run: npm run build
 
-      - name: Build Application
-        run: npm run build
-
-      - name: Deploy Application
-        run: ./deploy.sh  # Exemple de script de déploiement
+  #     - name: Deploy Application
+  #       run: ./deploy.sh  # Exemple de script de déploiement
 
 
 
