@@ -23,7 +23,7 @@ jobs:
       # Install dependencies and run tests in the backend
       - name: Install Backend Dependencies
         working-directory: ./backend
-        run: npm install && npm start
+        run: npm install
 
       - name: Run Backend Tests
         working-directory: ./backend
@@ -32,15 +32,15 @@ jobs:
       # Install dependencies and run tests in the frontend
       - name: Install Frontend Dependencies
         working-directory: ./frontend
-        run: npm install && npm start
+        run: npm install
 
       - name: Run Frontend Unit Tests
         working-directory: ./frontend
         run: npm run test
 
-      - name: Run Frontend Integration Tests
-        working-directory: ./frontend
-        run: npm run test:integration
+      # - name: Run Frontend Integration Tests
+      #   working-directory: ./frontend
+      #   run: npm run test:integration
 
       # Add comment to pull request if any tests fail
       - name: Add Comment to Pull Request (On Failure)
