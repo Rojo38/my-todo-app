@@ -54,4 +54,5 @@ jobs:
         run: |
           gcloud builds submit . \
             --config cloud-build.yaml \
-            --substitutions=_REGION="africa-south1",_SHORT_SHA=$(git rev-parse --short HEAD),_PIPELINE_NAME="my-todo-app-pipeline",_PROJECT_ID="my-todo-app-project-445006"
+            --substitutions=_PROJECT_ID="my-todo-app-project-445006",_SHORT_SHA=$(git rev-parse --short HEAD),_REGION="africa-south1"
+

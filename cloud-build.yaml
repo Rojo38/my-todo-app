@@ -1,41 +1,54 @@
 steps:
+# Build Frontend Image
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'africa-south1-docker.pkg.dev/my-todo-app-project-445006/my-todo-app-repo/my-todo-app-frontend', './frontend' ]
+  args: ['build', '-t', 'africa-south1-docker.pkg.dev/${_PROJECT_ID}/my-todo-app-repo/my-todo-app-frontend:${_SHORT_SHA}', './frontend']
   id: 'Build Docker Image - Frontend'
+  images:
+    - 'africa-south1-docker.pkg.dev/${_PROJECT_ID}/my-todo-app-repo/my-todo-app-frontend:${_SHORT_SHA}'
 
-  # images:
-  # - 'us-central1-docker.pkg.dev/<your_project_id>/gke-repo/quickstart-image'
-
+# Push Frontend Image
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'africa-south1-docker.pkg.dev/my-todo-app-project-445006/my-todo-app-repo/my-todo-app-frontend' ]
+  args: ['push', 'africa-south1-docker.pkg.dev/${_PROJECT_ID}/my-todo-app-repo/my-todo-app-frontend:${_SHORT_SHA}']
   id: 'Push Docker Image - Frontend'
 
+# Build Backend Image
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'africa-south1-docker.pkg.dev/my-todo-app-project-445006/my-todo-app-repo/my-todo-app-backend', './backend' ]
+  args: ['build', '-t', 'africa-south1-docker.pkg.dev/${_PROJECT_ID}/my-todo-app-repo/my-todo-app-backend:${_SHORT_SHA}', './backend']
   id: 'Build Docker Image - Backend'
+  images:
+    - 'africa-south1-docker.pkg.dev/${_PROJECT_ID}/my-todo-app-repo/my-todo-app-backend:${_SHORT_SHA}'
 
-  # images:
-  # - 'us-central1-docker.pkg.dev/<your_project_id>/gke-repo/quickstart-image'
-
+# Push Backend Image
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'africa-south1-docker.pkg.dev/my-todo-app-project-445006/my-todo-app-repo/my-todo-app-backend' ]
+  args: ['push', 'africa-south1-docker.pkg.dev/${_PROJECT_ID}/my-todo-app-repo/my-todo-app-backend:${_SHORT_SHA}']
   id: 'Push Docker Image - Backend'
 
-
+# Deploy to Kubernetes
 - name: 'google/cloud-sdk:latest'
   entrypoint: 'sh'
   args:
   - -xe
   - -c
   - |
-    gcloud deploy apply --file kubernetes/deploy/pipeline.yaml --region=africa-south1
-    gcloud deploy apply --file kubernetes/deploy/deploy-to-cluster-dev.yaml --region=africa-south1
-    gcloud deploy apply --file kubernetes/deploy/deploy-to-cluster-prod.yaml --region=africa-south1
+    gcloud deploy apply --file kubernetes/deploy/pipeline.yaml --region=${_REGION}
+    gcloud deploy apply --file kubernetes/deploy/deploy-to-cluster-dev.yaml --region=${_REGION}
+    gcloud deploy apply --file kubernetes/deploy/deploy-to-cluster-prod.yaml --region=${_REGION}
 
-    gcloud deploy releases create 'app-release-frontend-${SHORT_SHA}' --delivery-pipeline=my-todo-app-pipeline --region=africa-south1 --from-k8s-manifest=./kubernetes/frontend.yaml
-    gcloud deploy releases create 'app-release-backend-${SHORT_SHA}' --delivery-pipeline=my-todo-app-pipeline --region=africa-south1 --from-k8s-manifest=./kubernetes/backend.yaml
+    gcloud deploy releases create "app-release-frontend-${_SHORT_SHA}" \
+      --delivery-pipeline=my-todo-app-pipeline \
+      --region=${_REGION} \
+      --from-k8s-manifest=./kubernetes/frontend.yaml
 
+    gcloud deploy releases create "app-release-backend-${_SHORT_SHA}" \
+      --delivery-pipeline=my-todo-app-pipeline \
+      --region=${_REGION} \
+      --from-k8s-manifest=./kubernetes/backend.yaml
+
+# Log options
 options:
   logging: CLOUD_LOGGING_ONLY
 
-#gcloud deploy releases create 'app-release-${SHORT_SHA}' --delivery-pipeline=my-todo-app-pipeline --region=africa-south1 --skaffold-file=skaffold.yaml
+substitutions:
+  _PROJECT_ID: 'my-todo-app-project-445006'
+  _REGION: 'africa-south1'
+  _SHORT_SHA: 'default-short-sha'
