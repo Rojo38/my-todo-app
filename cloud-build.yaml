@@ -3,8 +3,6 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-t', 'africa-south1-docker.pkg.dev/${_PROJECT_ID}/my-todo-app-repo/my-todo-app-frontend:${_SHORT_SHA}', './frontend']
   id: 'Build Docker Image - Frontend'
-  images:
-    - 'africa-south1-docker.pkg.dev/${_PROJECT_ID}/my-todo-app-repo/my-todo-app-frontend:${_SHORT_SHA}'
 
 # Push Frontend Image
 - name: 'gcr.io/cloud-builders/docker'
@@ -15,8 +13,6 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-t', 'africa-south1-docker.pkg.dev/${_PROJECT_ID}/my-todo-app-repo/my-todo-app-backend:${_SHORT_SHA}', './backend']
   id: 'Build Docker Image - Backend'
-  images:
-    - 'africa-south1-docker.pkg.dev/${_PROJECT_ID}/my-todo-app-repo/my-todo-app-backend:${_SHORT_SHA}'
 
 # Push Backend Image
 - name: 'gcr.io/cloud-builders/docker'
@@ -44,7 +40,6 @@ steps:
       --region=${_REGION} \
       --from-k8s-manifest=./kubernetes/backend.yaml
 
-# Log options
 options:
   logging: CLOUD_LOGGING_ONLY
 
