@@ -1,0 +1,41 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'africa-south1-docker.pkg.dev/my-todo-app-project-445006/my-todo-app-repo/my-todo-app-frontend', './frontend' ]
+  id: 'Build Docker Image - Frontend'
+
+  # images:
+  # - 'us-central1-docker.pkg.dev/<your_project_id>/gke-repo/quickstart-image'
+
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'africa-south1-docker.pkg.dev/my-todo-app-project-445006/my-todo-app-repo/my-todo-app-frontend' ]
+  id: 'Push Docker Image - Frontend'
+
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'africa-south1-docker.pkg.dev/my-todo-app-project-445006/my-todo-app-repo/my-todo-app-backend', './backend' ]
+  id: 'Build Docker Image - Backend'
+
+  # images:
+  # - 'us-central1-docker.pkg.dev/<your_project_id>/gke-repo/quickstart-image'
+
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'africa-south1-docker.pkg.dev/my-todo-app-project-445006/my-todo-app-repo/my-todo-app-backend' ]
+  id: 'Push Docker Image - Backend'
+
+
+- name: 'google/cloud-sdk:latest'
+  entrypoint: 'sh'
+  args:
+  - -xe
+  - -c
+  - |
+    gcloud deploy apply --file kubernetes/deploy/pipeline.yaml --region=africa-south1
+    gcloud deploy apply --file kubernetes/deploy/deploy-to-cluster-dev.yaml --region=africa-south1
+    gcloud deploy apply --file kubernetes/deploy/deploy-to-cluster-prod.yaml --region=africa-south1
+
+    gcloud deploy releases create 'app-release-frontend-${SHORT_SHA}' --delivery-pipeline=my-todo-app-pipeline --region=africa-south1 --from-k8s-manifest=./kubernetes/frontend.yaml
+    gcloud deploy releases create 'app-release-backend-${SHORT_SHA}' --delivery-pipeline=my-todo-app-pipeline --region=africa-south1 --from-k8s-manifest=./kubernetes/backend.yaml
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+#gcloud deploy releases create 'app-release-${SHORT_SHA}' --delivery-pipeline=my-todo-app-pipeline --region=africa-south1 --skaffold-file=skaffold.yaml

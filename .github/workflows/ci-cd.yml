@@ -38,123 +38,20 @@ jobs:
         working-directory: ./frontend
         run: npm run test
 
+  deploy:
+    needs: test # Ensure this job runs only if "test" job is successful
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-      # - name: Run Frontend Integration Tests
-      #   working-directory: ./frontend
-      #   run: npm run test:integration
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
-      # Add comment to pull request if any tests fail
-      # - name: Add Comment to Pull Request (On Failure)
-      #   if: failure()
-      #   uses: actions/github-script@v6
-      #   with:
-      #     script: |
-      #       github.rest.issues.createComment({
-      #         issue_number: context.issue.number,
-      #         owner: context.repo.owner,
-      #         repo: context.repo.repo,
-      #         body: "🚨 Some tests failed! Please check the workflow logs: ${process.env.GITHUB_RUN_URL}"
-      #       })
-
-      # # Add comment to pull request if all tests pass
-      # - name: Add Comment to Pull Request (On Success)
-      #   if: success()
-      #   uses: actions/github-script@v6
-      #   with:
-      #     script: |
-      #       github.rest.issues.createComment({
-      #         issue_number: context.issue.number,
-      #         owner: context.repo.owner,
-      #         repo: context.repo.repo,
-      #         body: "✅ All tests passed successfully! 🎉 You can review and merge the changes. Check the workflow logs here: ${process.env.GITHUB_RUN_URL}"
-      #       })
-
-  # build-and-deploy:
-  #   runs-on: ubuntu-latest
-  #   needs: test  # Cette étape ne s'exécute que si "test" réussit
-  #   steps:
-  #     - name: Checkout Code
-  #       uses: actions/checkout@v3
-
-  #     - name: Build Application
-  #       run: npm run build
-
-  #     - name: Deploy Application
-  #       run: ./deploy.sh  # Exemple de script de déploiement
-
-
-
-
-
-
-
-
-# name: CI/CD Pipeline
-
-# on:
-#   push:
-#     branches:
-#       - main
-#   pull_request:
-#     branches:
-#       - main
-
-# jobs:
-#   test:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Checkout Code
-#         uses: actions/checkout@v3
-
-#       - name: Set up Node.js
-#         uses: actions/setup-node@v3
-
-#   build:
-#     runs-on: ubuntu-latest
-
-#     steps:
-#       - name: Checkout code
-#         uses: actions/checkout@v3
-
-#       - name: Set up Docker Buildx
-#         uses: docker/setup-buildx-action@v2
-
-#         # Étape 1 : Build et push de l'image Docker pour le backend
-#       - name: Build and Push Backend Docker Image
-#         run: |
-#           docker build -t my-dockerhub-username/todo-backend:${{ github.sha }} ./backend
-#           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-#           docker push my-dockerhub-username/todo-backend:${{ github.sha }}
-
-#         # Étape 2 : Build et push de l'image Docker pour le frontend
-#       - name: Build and Push Frontend Docker Image
-#         run: |
-#           docker build -t my-dockerhub-username/todo-frontend:${{ github.sha }} ./frontend
-#           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-#           docker push my-dockerhub-username/todo-frontend:${{ github.sha }}
-
-#         # Étape 3 : Push vers AWS ECR
-#       - name: Push Docker images to AWS ECR
-#         run: |
-#           aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 123456789012.dkr.ecr.us-west-2.amazonaws.com
-#           docker tag my-dockerhub-username/todo-backend:${{ github.sha }} 123456789012.dkr.ecr.us-west-2.amazonaws.com/todo-backend:${{ github.sha }}
-#           docker tag my-dockerhub-username/todo-frontend:${{ github.sha }} 123456789012.dkr.ecr.us-west-2.amazonaws.com/todo-frontend:${{ github.sha }}
-#           docker push 123456789012.dkr.ecr.us-west-2.amazonaws.com/todo-backend:${{ github.sha }}
-#           docker push 123456789012.dkr.ecr.us-west-2.amazonaws.com/todo-frontend:${{ github.sha }}
-
-#         # Étape 4 : Déploiement sur Kubernetes
-#       - name: Deploy to Kubernetes
-#         run: |
-#           kubectl set image deployment/todo-backend todo-backend=123456789012.dkr.ecr.us-west-2.amazonaws.com/todo-backend:${{ github.sha }}
-#           kubectl set image deployment/todo-frontend todo-frontend=123456789012.dkr.ecr.us-west-2.amazonaws.com/todo-frontend:${{ github.sha }}
-#           kubectl rollout restart deployment/todo-backend
-#           kubectl rollout restart deployment/todo-frontend
-
-#         # Étape 5 : Exécution des tests
-#       - name: Run Unit Tests with Jest
-#         run: |
-#           docker run --rm my-dockerhub-username/todo-backend:${{ github.sha }} npm test
-
-#       - name: Run Integration Tests with Cypress
-#         run: |
-#           docker run --rm my-dockerhub-username/todo-backend:${{ github.sha }} npm run test:integration
+      - name: Trigger Cloud Build
+        run: |
+          gcloud builds submit . \
+            --config cloud-build.yaml \
+            --substitutions=_REGION="africa-south1",_SHORT_SHA=$(git rev-parse --short HEAD),_PIPELINE_NAME="my-todo-app-pipeline",_PROJECT_ID="my-todo-app-project-445006"
