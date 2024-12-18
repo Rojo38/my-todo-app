@@ -38,36 +38,20 @@ jobs:
         working-directory: ./frontend
         run: npm run test
 
+  deploy:
+    needs: test # Ensure this job runs only if "test" job is successful
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-      # Trigger Cloud Build deployment if tests pass
-      - name: Trigger Cloud Build Deployment
-        if: ${{ success() }} # Only run if all previous steps succeed
-        env:
-          WEBHOOK_URL: ${{ secrets.WEBHOOK_TRIGGER_CLOUD_BUILD }}
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+      - name: Trigger Cloud Build
         run: |
-          curl -X POST \
-            -H "Content-Type: application/json" \
-            "$WEBHOOK_URL" \
-            -d '{}'
-            
-  # deploy:
-  #   needs: test # Ensure this job runs only if "test" job is successful
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout Code
-  #       uses: actions/checkout@v3
-
-  #     - name: Authenticate with Google Cloud
-  #       uses: google-github-actions/auth@v1
-  #       with:
-  #         credentials_json: 
-
-  #     - name: Set up GKE
-  #       run: |
-  #         gcloud container cluster get-credentials my-todo-cluster-dev --zone africa-south1
-
-  #     - name: Trigger Cloud Build
-  #       run: |
-  #         gcloud builds submit . \
-  #           --config cloudbuild.yaml \
-  #           --substitutions=_SHORT_SHA=$(git rev-parse --short HEAD),_PROJECT_ID="my-todo-app-project-445006",_REGION="africa-south1"
+          gcloud builds submit . \
+            --config cloudbuild.yaml \
+            --substitutions=_SHORT_SHA=$(git rev-parse --short HEAD),_PROJECT_ID="my-todo-app-project-445006",_REGION="africa-south1"
