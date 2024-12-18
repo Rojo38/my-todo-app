@@ -47,8 +47,8 @@ steps:
     gcloud deploy apply --file k8s/deploy/deploy-to-cluster-dev.yaml --region=africa-south1
     gcloud deploy apply --file k8s/deploy/deploy-to-cluster-prod.yaml --region=africa-south1
 
-    gcloud deploy releases create 'app-release-frontend-${SHORT_SHA}' --delivery-pipeline=my-todo-app-pipeline --region=africa-south1 --from-k8s-manifest=./k8s/frontend.yaml
-    gcloud deploy releases create 'app-release-backend-${SHORT_SHA}' --delivery-pipeline=my-todo-app-pipeline --region=africa-south1 --from-k8s-manifest=./k8s/backend.yaml
+    gcloud deploy releases create 'app-release-frontend-${SHORT_SHA:0:7}' --delivery-pipeline=my-todo-app-pipeline --region=africa-south1 --from-k8s-manifest=./k8s/frontend.yaml
+    gcloud deploy releases create 'app-release-backend-${SHORT_SHA:0:7}' --delivery-pipeline=my-todo-app-pipeline --region=africa-south1 --from-k8s-manifest=./k8s/backend.yaml
 
 # Deploy to Kubernetes
 # - name: 'gcr.io/cloud-builders/kubectl'
