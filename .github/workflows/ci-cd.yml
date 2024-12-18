@@ -53,5 +53,5 @@ jobs:
       - name: Trigger Cloud Build
         run: |
           gcloud builds submit . \
-            --config cloudbuild.yaml \
+            --config cloud-build.yaml \
             --substitutions=_SHORT_SHA=$(git rev-parse --short HEAD),_PROJECT_ID="my-todo-app-project-445006",_REGION="africa-south1"
