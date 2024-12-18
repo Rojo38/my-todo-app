@@ -1,21 +1,5 @@
 steps:
 
-# # Activer le service Artifact Registry
-# - name: 'gcr.io/cloud-builders/gcloud'
-#   args:
-#     - services
-#     - enable
-#     - artifactregistry.googleapis.com
-#   id: 'Enable Artifact Registry'
-
-# # Configurer l'authentification Docker pour Artifact Registry
-# - name: 'gcr.io/cloud-builders/gcloud'
-#   args:
-#     - auth
-#     - configure-docker
-#     - 'africa-south1-docker.pkg.dev'
-#   id: 'Configure Docker Authentication'
-
 # Build Frontend Image
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-t', 'africa-south1-docker.pkg.dev/my-todo-app-project-445006/my-todo-app-repo/my-todo-app-frontend', './frontend']
@@ -54,7 +38,7 @@ steps:
     # Create releases with the short SHA as part of the release name
     gcloud deploy releases create "app-release-frontend-${SHORT_SHA}" --delivery-pipeline=my-todo-app-pipeline --region=africa-south1 --from-k8s-manifest=./k8s/frontend.yaml
     gcloud deploy releases create "app-release-backend-${SHORT_SHA}" --delivery-pipeline=my-todo-app-pipeline --region=africa-south1 --from-k8s-manifest=./k8s/backend.yaml
-
+  
 # Deploy to Kubernetes
 # - name: 'gcr.io/cloud-builders/kubectl'
 #   args:
