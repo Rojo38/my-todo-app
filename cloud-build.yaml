@@ -18,34 +18,22 @@ steps:
 
 # Build Frontend Image
 - name: 'gcr.io/cloud-builders/docker'
-  args:
-    - build
-    - '-t'
-    - 'africa-south1-docker.pkg.dev/my-todo-app-project-445006/my-todo-app-repo/my-todo-app-frontend:${SHORT_SHA}'
-    - './frontend'
+  args: ['build', '-t', 'africa-south1-docker.pkg.dev/my-todo-app-project-445006/my-todo-app-repo/my-todo-app-frontend', './frontend']
   id: 'Build Docker Image - Frontend'
 
 # Push Frontend Image
 - name: 'gcr.io/cloud-builders/docker'
-  args:
-    - push
-    - 'africa-south1-docker.pkg.dev/my-todo-app-project-445006/my-todo-app-repo/my-todo-app-frontend:${SHORT_SHA}'
+  args: ['push', 'africa-south1-docker.pkg.dev/my-todo-app-project-445006/my-todo-app-repo/my-todo-app-frontend']
   id: 'Push Docker Image - Frontend'
 
 # Build Backend Image
 - name: 'gcr.io/cloud-builders/docker'
-  args:
-    - build
-    - '-t'
-    - 'africa-south1-docker.pkg.dev/my-todo-app-project-445006/my-todo-app-repo/my-todo-app-backend:${SHORT_SHA}'
-    - './backend'
+  args: ['build', '-t', 'africa-south1-docker.pkg.dev/my-todo-app-project-445006/my-todo-app-repo/my-todo-app-backend', './backend']
   id: 'Build Docker Image - Backend'
 
 # Push Backend Image
 - name: 'gcr.io/cloud-builders/docker'
-  args:
-    - push
-    - 'africa-south1-docker.pkg.dev/my-todo-app-project-445006/my-todo-app-repo/my-todo-app-backend:${SHORT_SHA}'
+  args: ['push', 'africa-south1-docker.pkg.dev/my-todo-app-project-445006/my-todo-app-repo/my-todo-app-backend' ]
   id: 'Push Docker Image - Backend'
 
 
