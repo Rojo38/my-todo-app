@@ -27,7 +27,7 @@ dist/
 docker-compose.override.yml
 docker-compose.override.yaml
 # *.env
-Dockerfile*
+# Dockerfile*
 
 # Cypress
 cypress/videos/
