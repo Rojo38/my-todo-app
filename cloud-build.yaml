@@ -43,12 +43,17 @@ steps:
   - -xe
   - -c
   - |
+    # Get the short SHA (assuming it's available in the environment or CI/CD context)
+    SHORT_SHA=$(git rev-parse --short=7 HEAD)
+
+    # Apply deployment manifests
     gcloud deploy apply --file k8s/deploy/pipeline.yaml --region=africa-south1
     gcloud deploy apply --file k8s/deploy/deploy-to-cluster-dev.yaml --region=africa-south1
     gcloud deploy apply --file k8s/deploy/deploy-to-cluster-prod.yaml --region=africa-south1
 
-    gcloud deploy releases create 'app-release-frontend-${SHORT_SHA:0:7}' --delivery-pipeline=my-todo-app-pipeline --region=africa-south1 --from-k8s-manifest=./k8s/frontend.yaml
-    gcloud deploy releases create 'app-release-backend-${SHORT_SHA:0:7}' --delivery-pipeline=my-todo-app-pipeline --region=africa-south1 --from-k8s-manifest=./k8s/backend.yaml
+    # Create releases with the short SHA as part of the release name
+    gcloud deploy releases create "app-release-frontend-${SHORT_SHA}" --delivery-pipeline=my-todo-app-pipeline --region=africa-south1 --from-k8s-manifest=./k8s/frontend.yaml
+    gcloud deploy releases create "app-release-backend-${SHORT_SHA}" --delivery-pipeline=my-todo-app-pipeline --region=africa-south1 --from-k8s-manifest=./k8s/backend.yaml
 
 # Deploy to Kubernetes
 # - name: 'gcr.io/cloud-builders/kubectl'
