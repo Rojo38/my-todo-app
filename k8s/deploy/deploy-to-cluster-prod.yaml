@@ -1,0 +1,9 @@
+apiVersion: deploy.cloud.google.com/v1
+kind: Target
+metadata:
+  name: my-todo-app-pipeline-target-2
+  annotations: {}
+  labels: {}
+description: my-todo-app-pipeline-target-2
+gke:
+  cluster: projects/my-todo-app-project-445006/locations/africa-south1/clusters/my-todo-cluster-prod

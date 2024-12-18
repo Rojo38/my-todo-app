@@ -2,15 +2,19 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: frontend-react-deployment
+  labels:
+    app: my-todo-app
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
-      app: my-todo-app-frontend
+      app: my-todo-app
+      component: frontend
   template:
     metadata:
       labels:
-        app: my-todo-app-frontend
+        app: my-todo-app
+        component: frontend
   spec:
     containers:
       - name: my-todo-app-frontend
@@ -26,9 +30,9 @@ metadata:
   name: frontend-service
 spec:
   selector:
-    app: my-todo-app-frontend
+    app: my-todo-app
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 3000
+      targetPort: 80
   type: LoadBalancer

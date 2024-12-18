@@ -2,15 +2,19 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: backend-nodejs-deployment
+  labels:
+    app: my-todo-app
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
-      app: my-todo-app-backend
+      app: my-todo-app
+      component: backend
   template:
     metadata:
       labels:
-        app: my-todo-app-backend
+        app: my-todo-app
+        component: backend
   spec:
     containers:
       - name: my-todo-app-backend
@@ -24,9 +28,13 @@ apiVersion: v1
 kind: Service
 metadata:
   name: backend-service
+  labels:
+    app: my-todo-app
+    component: backend
 spec:
   selector:
-    app: my-todo-app-backend
+    app: my-todo-app
+    component: backend
   ports:
     - protocol: TCP
       port: 5000

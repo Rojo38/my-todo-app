@@ -1,49 +1,86 @@
 steps:
+
+# Activer le service Artifact Registry
+- name: 'gcr.io/cloud-builders/gcloud'
+  args:
+    - services
+    - enable
+    - artifactregistry.googleapis.com
+  id: 'Enable Artifact Registry'
+
+# Configurer l'authentification Docker pour Artifact Registry
+- name: 'gcr.io/cloud-builders/gcloud'
+  args:
+    - auth
+    - configure-docker
+    - '${_REGION}-docker.pkg.dev'
+  id: 'Configure Docker Authentication'
+
 # Build Frontend Image
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'africa-south1-docker.pkg.dev/${_PROJECT_ID}/my-todo-app-repo/my-todo-app-frontend:${_SHORT_SHA}', './frontend']
+  args:
+    - build
+    - '-t'
+    - '${_REGION}-docker.pkg.dev/${_PROJECT_ID}/my-todo-app-repo/my-todo-app-frontend:${_SHORT_SHA}'
+    - './frontend'
   id: 'Build Docker Image - Frontend'
 
 # Push Frontend Image
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'africa-south1-docker.pkg.dev/${_PROJECT_ID}/my-todo-app-repo/my-todo-app-frontend:${_SHORT_SHA}']
+  args:
+    - push
+    - '${_REGION}-docker.pkg.dev/${_PROJECT_ID}/my-todo-app-repo/my-todo-app-frontend:${_SHORT_SHA}'
   id: 'Push Docker Image - Frontend'
 
 # Build Backend Image
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'africa-south1-docker.pkg.dev/${_PROJECT_ID}/my-todo-app-repo/my-todo-app-backend:${_SHORT_SHA}', './backend']
+  args:
+    - build
+    - '-t'
+    - '${_REGION}-docker.pkg.dev/${_PROJECT_ID}/my-todo-app-repo/my-todo-app-backend:${_SHORT_SHA}'
+    - './backend'
   id: 'Build Docker Image - Backend'
 
 # Push Backend Image
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'africa-south1-docker.pkg.dev/${_PROJECT_ID}/my-todo-app-repo/my-todo-app-backend:${_SHORT_SHA}']
+  args:
+    - push
+    - '${_REGION}-docker.pkg.dev/${_PROJECT_ID}/my-todo-app-repo/my-todo-app-backend:${_SHORT_SHA}'
   id: 'Push Docker Image - Backend'
 
-# Deploy to Kubernetes
+
 - name: 'google/cloud-sdk:latest'
   entrypoint: 'sh'
   args:
   - -xe
   - -c
   - |
-    gcloud deploy apply --file kubernetes/deploy/pipeline.yaml --region=${_REGION}
-    gcloud deploy apply --file kubernetes/deploy/deploy-to-cluster-dev.yaml --region=${_REGION}
-    gcloud deploy apply --file kubernetes/deploy/deploy-to-cluster-prod.yaml --region=${_REGION}
+    gcloud deploy apply --file k8s/deploy/pipeline.yaml --region=africa-south1
+    gcloud deploy apply --file k8s/deploy/deploy-to-cluster-dev.yaml --region=africa-south1
+    gcloud deploy apply --file k8s/deploy/deploy-to-cluster-prod.yaml --region=africa-south1
 
-    gcloud deploy releases create "app-release-frontend-${_SHORT_SHA}" \
-      --delivery-pipeline=my-todo-app-pipeline \
-      --region=${_REGION} \
-      --from-k8s-manifest=./kubernetes/frontend.yaml
+    gcloud deploy releases create 'app-release-frontend-${SHORT_SHA}' --delivery-pipeline=my-todo-app-pipeline --region=africa-south1 --from-k8s-manifest=./k8s/frontend.yaml
+    gcloud deploy releases create 'app-release-backend-${SHORT_SHA}' --delivery-pipeline=my-todo-app-pipeline --region=africa-south1 --from-k8s-manifest=./k8s/backend.yaml
 
-    gcloud deploy releases create "app-release-backend-${_SHORT_SHA}" \
-      --delivery-pipeline=my-todo-app-pipeline \
-      --region=${_REGION} \
-      --from-k8s-manifest=./kubernetes/backend.yaml
+# Deploy to Kubernetes
+# - name: 'gcr.io/cloud-builders/kubectl'
+#   args:
+#     - apply
+#     - '-f'
+#     - './k8s/frontend.yaml'
+#   id: 'Deploy Frontend'
+
+# - name: 'gcr.io/cloud-builders/kubectl'
+#   args:
+#     - apply
+#     - '-f'
+#     - './k8s/backend.yaml'
+#   id: 'Deploy Backend'
 
 options:
   logging: CLOUD_LOGGING_ONLY
 
 substitutions:
+  _SHORT_SHA: 'default-short-sha'
   _PROJECT_ID: 'my-todo-app-project-445006'
   _REGION: 'africa-south1'
-  _SHORT_SHA: 'default-short-sha'

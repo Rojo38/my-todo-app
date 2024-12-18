@@ -1,13 +1,15 @@
-apiVersion: skaffold/v4beta9
+apiVersion: skaffold/v1beta4
 kind: Config
+metadata:
+  name: my-todo-cluster-dev
+
 build:
   tagPolicy:
-    gitCommit: {}
-  local: {}
+    sha256: {}      # Utilisez `sha256` pour générer des tags uniques (remplace `gitCommit` pour v0.25.0).
+  local:
+    push: true      # Pousse les images vers un registre distant.
+
 manifests:
   rawYaml:
-    - ./kubernetes/*
-deploy:
-  kubectl: {}
-  logs:
-    prefix: container
+    - ./k8s/deploy/deploy-to-cluster-dev.yaml
+    - ./k8s/*

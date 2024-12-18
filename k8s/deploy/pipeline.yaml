@@ -8,6 +8,7 @@ description: cicd delivery pipeline
 serialPipeline:
   stages:
   - targetId: my-todo-app-pipeline-target-1
+  - targetId: my-todo-app-pipeline-target-2
     # profiles:
     # - dev
   # - targetId: staging
