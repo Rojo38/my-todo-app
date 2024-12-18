@@ -13,7 +13,7 @@ steps:
 #   args:
 #     - auth
 #     - configure-docker
-#     - '${_REGION}-docker.pkg.dev'
+#     - 'africa-south1-docker.pkg.dev'
 #   id: 'Configure Docker Authentication'
 
 # Build Frontend Image
@@ -21,7 +21,7 @@ steps:
   args:
     - build
     - '-t'
-    - '${_REGION}-docker.pkg.dev/${_PROJECT_ID}/my-todo-app-repo/my-todo-app-frontend:${_SHORT_SHA}'
+    - 'africa-south1-docker.pkg.dev/my-todo-app-project-445006/my-todo-app-repo/my-todo-app-frontend:${SHORT_SHA}'
     - './frontend'
   id: 'Build Docker Image - Frontend'
 
@@ -29,7 +29,7 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args:
     - push
-    - '${_REGION}-docker.pkg.dev/${_PROJECT_ID}/my-todo-app-repo/my-todo-app-frontend:${_SHORT_SHA}'
+    - 'africa-south1-docker.pkg.dev/my-todo-app-project-445006/my-todo-app-repo/my-todo-app-frontend:${SHORT_SHA}'
   id: 'Push Docker Image - Frontend'
 
 # Build Backend Image
@@ -37,7 +37,7 @@ steps:
   args:
     - build
     - '-t'
-    - '${_REGION}-docker.pkg.dev/${_PROJECT_ID}/my-todo-app-repo/my-todo-app-backend:${_SHORT_SHA}'
+    - 'africa-south1-docker.pkg.dev/my-todo-app-project-445006/my-todo-app-repo/my-todo-app-backend:${SHORT_SHA}'
     - './backend'
   id: 'Build Docker Image - Backend'
 
@@ -45,7 +45,7 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args:
     - push
-    - '${_REGION}-docker.pkg.dev/${_PROJECT_ID}/my-todo-app-repo/my-todo-app-backend:${_SHORT_SHA}'
+    - 'africa-south1-docker.pkg.dev/my-todo-app-project-445006/my-todo-app-repo/my-todo-app-backend:${SHORT_SHA}'
   id: 'Push Docker Image - Backend'
 
 
@@ -80,7 +80,5 @@ steps:
 options:
   logging: CLOUD_LOGGING_ONLY
 
-substitutions:
-  _SHORT_SHA: 'default-short-sha'
-  _PROJECT_ID: 'my-todo-app-project-445006'
-  _REGION: 'africa-south1'
+# substitutions:
+#   _SHORT_SHA: 'default-short-sha'
