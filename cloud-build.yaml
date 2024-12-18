@@ -1,20 +1,20 @@
 steps:
 
-# Activer le service Artifact Registry
-- name: 'gcr.io/cloud-builders/gcloud'
-  args:
-    - services
-    - enable
-    - artifactregistry.googleapis.com
-  id: 'Enable Artifact Registry'
+# # Activer le service Artifact Registry
+# - name: 'gcr.io/cloud-builders/gcloud'
+#   args:
+#     - services
+#     - enable
+#     - artifactregistry.googleapis.com
+#   id: 'Enable Artifact Registry'
 
-# Configurer l'authentification Docker pour Artifact Registry
-- name: 'gcr.io/cloud-builders/gcloud'
-  args:
-    - auth
-    - configure-docker
-    - '${_REGION}-docker.pkg.dev'
-  id: 'Configure Docker Authentication'
+# # Configurer l'authentification Docker pour Artifact Registry
+# - name: 'gcr.io/cloud-builders/gcloud'
+#   args:
+#     - auth
+#     - configure-docker
+#     - '${_REGION}-docker.pkg.dev'
+#   id: 'Configure Docker Authentication'
 
 # Build Frontend Image
 - name: 'gcr.io/cloud-builders/docker'
