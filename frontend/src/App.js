@@ -7,7 +7,8 @@ import Card from './Components/Card/Card.js';
 function App() {
 
   // const API_URL = 'http://backend:5000';
-  const API_URL = 'http://backend-service.default.svc.cluster.local:5000';
+  // const API_URL = 'http://backend-service.default.svc.cluster.local:5000';
+  const API_URL = '34.118.236.60:5000';
 
   const [updateTheTask, setUpdateTheTask]  = useState(false);
   const [idToBeUpdated, setIdToBeUpdated] = useState('');
